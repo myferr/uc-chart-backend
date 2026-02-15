@@ -222,6 +222,18 @@ async def upload_profile(
     # Calculate hash
     file_hash = calculate_sha256(png_bytes)
 
+    # Delete all files under profile/
+    async with app.s3_session_getter() as s3:
+        bucket = await s3.Bucket(app.s3_bucket)
+        batch = []
+        async for obj in bucket.objects.filter(Prefix=f"{id}/profile/"):
+            batch.append({"Key": obj.key})
+            if len(batch) == 1000:
+                await bucket.delete_objects(Delete={"Objects": batch})
+                batch = []
+        if batch:
+            await bucket.delete_objects(Delete={"Objects": batch})
+
     # Upload to S3
     async with app.s3_session_getter() as s3:
         bucket = await s3.Bucket(app.s3_bucket)
@@ -304,6 +316,18 @@ async def upload_banner(
 
     # Calculate hash
     file_hash = calculate_sha256(png_bytes)
+
+    # Delete all files under banner/
+    async with app.s3_session_getter() as s3:
+        bucket = await s3.Bucket(app.s3_bucket)
+        batch = []
+        async for obj in bucket.objects.filter(Prefix=f"{id}/banner/"):
+            batch.append({"Key": obj.key})
+            if len(batch) == 1000:
+                await bucket.delete_objects(Delete={"Objects": batch})
+                batch = []
+        if batch:
+            await bucket.delete_objects(Delete={"Objects": batch})
 
     # Upload to S3
     async with app.s3_session_getter() as s3:
