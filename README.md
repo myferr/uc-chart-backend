@@ -86,7 +86,7 @@ s3:
   bucket-name: "your-bucket-name"
   access-key-id: "your-access-key"
   secret-access-key: "your-secret-key"
-  location: "auto"                        # Use "auto" for Cloudflare R2
+  location:
 
 psql:
   host: "localhost"
@@ -115,7 +115,7 @@ oauth:
 
 ```bash
 # Run the database setup script
-python scripts/database_setup.py
+python -m scripts.database_setup
 ```
 
 This creates all necessary tables:
@@ -174,45 +174,6 @@ CREATE EXTENSION pg_cron;
 | `chart_likes` | chart_id, sonolus_id                                                                                    | chart_id references charts.id; sonolus_id references accounts.sonolus_id     |
 | `comments`    | chart_id, commenter, content                                                                            | chart_id references charts.id; commenter references accounts.sonolus_id      |
 
-## API Endpoints
-
-### Charts
-
-| Endpoint                  | Method | Description                                        |
-|---------------------------|--------|----------------------------------------------------|
-| `/charts`                 | GET    | List/search charts with filters                    |
-| `/charts`                 | POST   | Upload a new chart                                 |
-| `/charts/{id}`            | GET    | Get chart details                                  |
-| `/charts/{id}`            | PATCH  | Update chart metadata                              |
-| `/charts/{id}`            | DELETE | Delete a chart                                     |
-| `/charts/{id}/like`       | POST   | Like a chart                                       |
-| `/charts/{id}/like`       | DELETE | Unlike a chart                                     |
-| `/charts/{id}/visibility` | PUT    | Change chart visibility (PRIVATE/UNLISTED/PUBLIC)  |
-| `/charts/{id}/stpick`     | PUT    | Mark as staff pick                                 |
-| `/charts/{id}/comment`    | POST   | Add a comment                                      |
-| `/charts/{id}/trends`     | GET    | Get like trends over time                          |
-| `/charts/leaderboards`    | GET    | Get leaderboard entries                            |
-
-### Accounts
-
-| Endpoint                          | Method | Description                       |
-|------------------------------------|--------|-----------------------------------|
-| `/accounts/session`                | POST   | Create a new session              |
-| `/accounts/session`                | GET    | Get current session info          |
-| `/accounts/{id}`                   | GET    | Get user profile                  |
-| `/accounts/{id}/staff`             | PUT    | Grant/remove staff privileges      |
-| `/accounts/{id}/moderation`        | PUT    | Ban/unban user                    |
-| `/accounts/handle/{handle}`        | GET    | Get user by handle                |
-| `/accounts/can_upload`             | GET    | Check if user can upload          |
-| `/accounts/oauth/discord`          | GET    | Discord OAuth login               |
-
-### Notifications
-
-| Endpoint                             | Method | Description        |
-|---------------------------------------|--------|--------------------|
-| `/accounts/notifications`             | GET    | List notifications |
-| `/accounts/notifications/{id}`        | PATCH  | Mark as read       |
-
 ## Development
 
 ### Running in Debug Mode
@@ -255,18 +216,6 @@ pytest
 **"Connection refused" errors**
 - Check PostgreSQL is running and accessible
 - Verify credentials in `config.yml`
-
-**"No such bucket" errors**
-- Verify S3/R2 bucket exists and credentials are correct
-- Check endpoint URL is correct
-
-**Charts not appearing**
-- Check chart status is set to `PUBLIC`
-- Verify file hashes are correct in database
-
-**OAuth login not working**
-- Verify Discord client ID/secret are correct
-- Check redirect URI matches Discord app settings
 
 ## License
 
